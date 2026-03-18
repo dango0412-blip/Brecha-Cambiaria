@@ -229,6 +229,16 @@
     margin-bottom:var(--gap); box-shadow:var(--shadow);
     position:relative; overflow:hidden;
   }
+  .calc-decimal-hint {
+    font-family:'Space Mono',monospace; font-size:.55rem;
+    color:var(--muted); margin-top:.35rem;
+  }
+  .calc-decimal-hint kbd {
+    background:var(--border); border-radius:3px;
+    padding:.05rem .3rem; color:var(--text2); font-family:inherit;
+  }
+  .calc-decimal-hint span { color:var(--text2); }
+
   .calc-section-mini-label {
     font-family:'Space Mono',monospace; font-size:.58rem;
     text-transform:uppercase; letter-spacing:.1em;
@@ -535,7 +545,8 @@
     <!-- Input -->
     <div class="calc-field" style="margin-bottom:.8rem">
       <label id="calcInputLabel">Monto en USD / EUR</label>
-      <input type="text" id="calcInput" value="100" inputmode="decimal" autocomplete="off" placeholder="0">
+      <input type="text" id="calcInput" value="100" inputmode="text" autocomplete="off" placeholder="0">
+      <div class="calc-decimal-hint">Usa <kbd>,</kbd> para decimales · ej: <span>1.500,50</span></div>
     </div>
 
     <!-- USD results row -->
