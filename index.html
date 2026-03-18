@@ -291,7 +291,7 @@
   /* ── Chart panel ── */
   .chart-panel {
     background:var(--panel); border:1px solid var(--border);
-    border-radius:14px; padding:1.6rem 1.8rem;
+    border-radius:14px; padding:1.2rem 1rem 1rem;
     margin-bottom:var(--gap); box-shadow:var(--shadow);
     position:relative; overflow:hidden;
   }
@@ -301,25 +301,25 @@
     background:linear-gradient(90deg,var(--accent-green),var(--accent-cyan));
   }
   .chart-header {
-    display:flex; align-items:center;
+    display:flex; align-items:flex-start;
     justify-content:space-between;
-    margin-bottom:1.4rem; flex-wrap:wrap; gap:.6rem;
+    margin-bottom:.8rem; flex-wrap:wrap; gap:.5rem;
   }
-  .chart-title { font-size:.95rem; font-weight:700; color:var(--text); }
+  .chart-title { font-size:.9rem; font-weight:700; color:var(--text); }
   .chart-legend {
-    display:flex; gap:1rem; align-items:center;
-    font-family:'Space Mono',monospace; font-size:.58rem; color:var(--muted);
+    display:flex; gap:.6rem; align-items:center; flex-wrap:wrap;
+    font-family:'Space Mono',monospace; font-size:.55rem; color:var(--text2);
   }
   .legend-dot {
-    width:9px; height:9px; border-radius:50%; display:inline-block; margin-right:.3rem;
+    width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:.25rem;
   }
   .chart-filters {
-    display:flex; gap:.4rem; margin-bottom:1rem;
+    display:flex; gap:.4rem; margin-bottom:.8rem;
   }
   .chart-btn {
-    font-family:'Space Mono',monospace; font-size:.6rem;
+    font-family:'Space Mono',monospace; font-size:.58rem;
     letter-spacing:.06em; text-transform:uppercase;
-    padding:.28rem .7rem; border-radius:5px;
+    padding:.25rem .65rem; border-radius:5px;
     border:1px solid var(--border); background:transparent;
     color:var(--muted); cursor:pointer; transition:all .15s;
   }
@@ -327,11 +327,12 @@
   .chart-btn.active { background:var(--accent-cyan); border-color:var(--accent-cyan); color:#080b14; font-weight:700; }
 
   .chart-status {
-    font-family:'Space Mono',monospace; font-size:.6rem;
-    color:var(--muted); margin-top:.6rem; text-align:center;
-    min-height:1.2em;
+    font-family:'Space Mono',monospace; font-size:.58rem;
+    color:var(--muted); margin-top:.5rem; text-align:center;
+    min-height:1.1em;
   }
-  .chart-wrap { position:relative; height:280px; }
+  .chart-wrap { position:relative; height:260px; }
+  @media(max-width:520px){ .chart-wrap{ height:200px; } }
 
   /* ── Calculator ── */
   .calc-panel {
@@ -544,16 +545,19 @@
       <div class="card-tag">Oficial BCV · USD</div>
       <div class="card-rate loading" id="bcvRate">—</div>
       <div class="card-sub">Bs. por USD</div>
+      <div class="card-source">ve.dolarapi.com · BCV</div>
     </div>
     <div class="card paralelo">
       <div class="card-tag">USDT P2P · Binance</div>
       <div class="card-rate loading" id="p2pRate">—</div>
       <div class="card-sub">Bs. por USDT</div>
+      <div class="card-source">ve.dolarapi.com · USDT P2P Binance</div>
     </div>
     <div class="card euro-card">
       <div class="card-tag">Oficial BCV · EUR</div>
       <div class="card-rate loading" id="bcvEurCard">—</div>
       <div class="card-sub">Bs. por EUR</div>
+      <div class="card-source">ve.dolarapi.com · BCV</div>
     </div>
   </div>
 
@@ -812,8 +816,8 @@
     document.getElementById('chartStatus').textContent = 'Cargando histórico...';
     try {
       const [resOficial, resParalelo] = await Promise.all([
-        fetch('https://ve.dolarapi.com/v1/historicos/dolares/oficial'),
-        fetch('https://ve.dolarapi.com/v1/historicos/dolares/paralelo')
+        fetchWithTimeout('https://ve.dolarapi.com/v1/historicos/dolares/oficial', 12000),
+        fetchWithTimeout('https://ve.dolarapi.com/v1/historicos/dolares/paralelo', 12000)
       ]);
 
       if (!resOficial.ok || !resParalelo.ok) throw new Error('API histórico error');
@@ -942,17 +946,18 @@
         responsive: true,
         maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
+        layout: { padding: { left: 0, right: 4, top: 4, bottom: 0 } },
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: '#1a1d2e',
-            borderColor: '#252840',
+            backgroundColor: '#161928',
+            borderColor: '#1f2438',
             borderWidth: 1,
-            titleColor: '#9aa3c2',
-            bodyColor: '#e2e6f3',
-            titleFont: { family: 'Space Mono', size: 10 },
-            bodyFont:  { family: 'Space Mono', size: 11 },
-            padding: 10,
+            titleColor: '#8892b5',
+            bodyColor: '#eef0fb',
+            titleFont: { family: 'Space Mono', size: 9 },
+            bodyFont:  { family: 'Space Mono', size: 10 },
+            padding: 8,
             callbacks: {
               label: (ctx) => {
                 const lbl = ctx.dataset.label;
@@ -966,12 +971,13 @@
         scales: {
           x: {
             ticks: {
-              color: '#555e80',
-              font: { family: 'Space Mono', size: 9 },
-              maxRotation: 45,
-              maxTicksLimit: 12,
+              color: '#4a5270',
+              font: { family: 'Space Mono', size: 8 },
+              maxRotation: 0,
+              maxTicksLimit: 6,
+              autoSkip: true,
             },
-            grid: { color: 'rgba(31,36,56,0.8)' },
+            grid: { color: 'rgba(31,36,56,0.6)' },
           },
           yRate: {
             type: 'linear',
@@ -983,15 +989,16 @@
             position: 'left',
             ticks: {
               color: '#ff8c00',
-              font: { family: 'Space Mono', size: 9 },
-              callback: v => v.toFixed(0)+'%'
+              font: { family: 'Space Mono', size: 8 },
+              callback: v => v.toFixed(0)+'%',
+              maxTicksLimit: 6,
             },
-            grid: { color: 'rgba(31,36,56,0.8)' },
+            grid: { color: 'rgba(31,36,56,0.6)' },
             title: {
               display: true,
               text: 'Brecha %',
               color: '#ff8c00',
-              font: { family: 'Space Mono', size: 9 }
+              font: { family: 'Space Mono', size: 8 }
             }
           }
         }
@@ -1000,62 +1007,108 @@
   }
 
   /* ─── Main fetch ─── */
+  const CORS_OPTS = { mode: 'cors', headers: { 'Accept': 'application/json' } };
+
+  function fetchWithTimeout(url, ms = 8000) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), ms);
+    return fetch(url, { ...CORS_OPTS, signal: controller.signal })
+      .finally(() => clearTimeout(id));
+  }
+
+  function extractVal(obj) {
+    return obj?.promedio ?? obj?.venta ?? obj?.precio ?? obj?.tasa ?? null;
+  }
+
+  async function tryDolarApi() {
+    const [resUsd, resP2P, resEur] = await Promise.all([
+      fetchWithTimeout('https://ve.dolarapi.com/v1/dolares/oficial'),
+      fetchWithTimeout('https://ve.dolarapi.com/v1/dolares/paralelo'),
+      fetchWithTimeout('https://ve.dolarapi.com/v1/euros/oficial'),
+    ]);
+    if (!resUsd.ok || !resP2P.ok) throw new Error('dolarapi status error');
+    const dUsd = await resUsd.json();
+    const dP2P = await resP2P.json();
+    const bv = extractVal(dUsd);
+    const pv = extractVal(dP2P);
+    if (!bv || !pv) throw new Error('dolarapi datos vacios');
+    if (resEur.ok) { const dEur = await resEur.json(); euroVal = extractVal(dEur); }
+    return { bcv: bv, p2p: pv };
+  }
+
+  async function tryDolarApiList() {
+    const [resDolares, resEuros] = await Promise.all([
+      fetchWithTimeout('https://ve.dolarapi.com/v1/dolares'),
+      fetchWithTimeout('https://ve.dolarapi.com/v1/euros'),
+    ]);
+    const arrD = await resDolares.json();
+    const oficial  = arrD.find(d => d.fuente==='oficial' || d.nombre?.toLowerCase().includes('oficial'));
+    const paralelo = arrD.find(d => d.fuente==='paralelo' || d.nombre?.toLowerCase().includes('paralelo') || d.nombre?.toLowerCase().includes('binance'));
+    if (!oficial || !paralelo) throw new Error('lista vacia');
+    const bv = extractVal(oficial);
+    const pv = extractVal(paralelo);
+    if (!bv || !pv) throw new Error('valores nulos en lista');
+    if (resEuros.ok) {
+      const arrE = await resEuros.json();
+      const eof = arrE.find(e => e.fuente==='oficial' || e.nombre?.toLowerCase().includes('oficial'));
+      if (eof) euroVal = extractVal(eof);
+    }
+    return { bcv: bv, p2p: pv };
+  }
+
+  async function tryPydolarve() {
+    // pydolarve.org: GET /v2/dollar?page=bcv  and  /v2/dollar?page=binance
+    const [resBcv, resBin, resEur] = await Promise.all([
+      fetchWithTimeout('https://pydolarve.org/api/v2/dollar?page=bcv'),
+      fetchWithTimeout('https://pydolarve.org/api/v2/dollar?page=binance'),
+      fetchWithTimeout('https://pydolarve.org/api/v2/euro?page=bcv'),
+    ]);
+    if (!resBcv.ok || !resBin.ok) throw new Error('pydolarve error');
+    const dBcv = await resBcv.json();
+    const dBin = await resBin.json();
+    // pydolarve returns { monitors: { ... } }
+    const bcvMonitor = dBcv?.monitors?.bcv ?? dBcv?.monitors?.['BCV'] ?? Object.values(dBcv?.monitors ?? {})[0];
+    const binMonitor = dBin?.monitors?.binance ?? dBin?.monitors?.['Binance'] ?? Object.values(dBin?.monitors ?? {})[0];
+    const bv = bcvMonitor?.price ?? bcvMonitor?.last_update?.price ?? null;
+    const pv = binMonitor?.price ?? binMonitor?.last_update?.price ?? null;
+    if (!bv || !pv) throw new Error('pydolarve datos vacios');
+    if (resEur.ok) {
+      const dEur = await resEur.json();
+      const eurMon = dEur?.monitors?.bcv ?? Object.values(dEur?.monitors ?? {})[0];
+      if (eurMon) euroVal = eurMon?.price ?? null;
+    }
+    return { bcv: bv, p2p: pv };
+  }
+
   async function fetchRates() {
     const btn = document.getElementById('refreshBtn');
     btn.classList.add('spinning'); btn.textContent = '⟳ Actualizando...';
     setStatus('', 'Obteniendo datos...');
 
-    try {
-      const [resUsd, resP2P, resEur] = await Promise.all([
-        fetch('https://ve.dolarapi.com/v1/dolares/oficial'),
-        fetch('https://ve.dolarapi.com/v1/dolares/paralelo'),
-        fetch('https://ve.dolarapi.com/v1/euros/oficial')
-      ]);
+    let result = null;
+    const errors = [];
 
-      if (!resUsd.ok || !resP2P.ok) throw new Error('API error');
-
-      const dUsd = await resUsd.json();
-      const dP2P = await resP2P.json();
-
-      bcvVal = dUsd.promedio ?? dUsd.venta ?? dUsd.precio;
-      p2pVal = dP2P.promedio ?? dP2P.venta ?? dP2P.precio;
-      if (!bcvVal || !p2pVal) throw new Error('Datos incompletos');
-
-      if (resEur.ok) {
-        const dEur = await resEur.json();
-        euroVal = dEur.promedio ?? dEur.venta ?? dEur.precio;
+    // Try 3 sources in sequence
+    for (const [name, fn] of [['dolarapi-directo', tryDolarApi], ['dolarapi-lista', tryDolarApiList], ['pydolarve', tryPydolarve]]) {
+      try {
+        result = await fn();
+        break;
+      } catch(e) {
+        errors.push(`${name}: ${e.message}`);
       }
+    }
 
+    if (result) {
+      bcvVal = result.bcv;
+      p2pVal = result.p2p;
       document.getElementById('lastUpdate').textContent =
         'Actualizado: ' + new Date().toLocaleTimeString('es-VE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
       setStatus('live', 'En vivo');
       updateUI();
-
-    } catch(err) {
-      try {
-        const [resDolares, resEuros] = await Promise.all([
-          fetch('https://ve.dolarapi.com/v1/dolares'),
-          fetch('https://ve.dolarapi.com/v1/euros')
-        ]);
-        const arrD     = await resDolares.json();
-        const oficial  = arrD.find(d=>d.fuente==='oficial'||d.nombre?.toLowerCase().includes('oficial'));
-        const paralelo = arrD.find(d=>d.fuente==='paralelo'||d.nombre?.toLowerCase().includes('paralelo')||d.nombre?.toLowerCase().includes('binance'));
-        if (!oficial||!paralelo) throw new Error('No tasas');
-        bcvVal = oficial.promedio  ?? oficial.venta  ?? oficial.precio;
-        p2pVal = paralelo.promedio ?? paralelo.venta ?? paralelo.precio;
-        if (resEuros.ok) {
-          const arrE = await resEuros.json();
-          const eof  = arrE.find(e=>e.fuente==='oficial'||e.nombre?.toLowerCase().includes('oficial'));
-          if (eof) euroVal = eof.promedio ?? eof.venta ?? eof.precio;
-        }
-        document.getElementById('lastUpdate').textContent =
-          'Actualizado: ' + new Date().toLocaleTimeString('es-VE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-        setStatus('live', 'En vivo');
-        updateUI();
-      } catch(e2) {
-        setStatus('error', 'Error de conexión');
-        showAlert('err', 'No se pudo conectar a la API. Verifica tu conexión e intenta de nuevo.');
-      }
+    } else {
+      setStatus('error', 'Error de conexión');
+      showAlert('err', 'No se pudo obtener los datos. Verifica tu conexión a internet e intenta de nuevo.');
+      console.warn('Todos los endpoints fallaron:', errors);
     }
 
     btn.classList.remove('spinning'); btn.textContent = '⟳ Actualizar ahora';
