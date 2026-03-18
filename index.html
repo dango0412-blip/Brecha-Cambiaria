@@ -4,24 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Brecha Cambiaria · Venezuela</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root {
-    --bg:     #0d0f18;
-    --panel:  #141620;
-    --panel2: #1a1d2e;
-    --border: #252840;
-    --accent-green:  #00e676;
-    --accent-red:    #ff4060;
-    --accent-yellow: #ff7a00;
-    --accent-blue:   #00c875;
-    --accent-purple: #a78bfa;
-    --text:   #e2e6f3;
-    --text2:  #9aa3c2;
-    --muted:  #555e80;
+    --bg:     #080b14;
+    --panel:  #0f1220;
+    --panel2: #161928;
+    --border: #1f2438;
+    --accent-green:  #05e87a;
+    --accent-red:    #ff3d5a;
+    --accent-yellow: #ff8c00;
+    --accent-blue:   #05e87a;
+    --accent-cyan:   #00d4ff;
+    --accent-purple: #b06eff;
+    --accent-pink:   #ff4db8;
+    --text:   #eef0fb;
+    --text2:  #8892b5;
+    --muted:  #4a5270;
     --gap:    1.4rem;
-    --shadow: 0 4px 24px rgba(0,0,0,0.45);
+    --shadow: 0 4px 28px rgba(0,0,0,0.55);
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -37,9 +39,9 @@
   body::before {
     content:'';
     position:fixed; inset:0;
-    background-image: radial-gradient(circle, #252840 1px, transparent 1px);
+    background-image: radial-gradient(circle, #1f2438 1px, transparent 1px);
     background-size: 28px 28px;
-    pointer-events:none; z-index:0; opacity:0.6;
+    pointer-events:none; z-index:0; opacity:0.7;
   }
 
   .container {
@@ -60,7 +62,12 @@
     font-weight:800; letter-spacing:-0.03em; line-height:1;
     color:var(--text);
   }
-  .logo-area h1 span { color:var(--accent-blue); }
+  .logo-area h1 span {
+    background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 
   .logo-area p {
     font-family:'Space Mono',monospace;
@@ -85,8 +92,8 @@
   /* ── Section label ── */
   .section-label {
     font-family:'Space Mono',monospace;
-    font-size:0.57rem; letter-spacing:0.15em;
-    text-transform:uppercase; color:var(--muted);
+    font-size:0.6rem; letter-spacing:0.15em;
+    text-transform:uppercase; color:var(--text2);
     margin-bottom:0.75rem; padding-left:0.1rem;
   }
 
@@ -100,7 +107,7 @@
   .brecha-panel::before {
     content:''; position:absolute;
     top:0;left:0;right:0; height:4px;
-    background:linear-gradient(90deg,var(--accent-blue),var(--accent-purple));
+    background:linear-gradient(90deg,var(--accent-cyan),var(--accent-pink));
   }
 
   .brecha-inner {
@@ -121,9 +128,9 @@
     color:var(--accent-yellow); transition:color .5s; min-height:1em;
   }
   .brecha-value.loading { color:var(--muted); }
-  .brecha-value.low  { color:var(--accent-green); }
-  .brecha-value.mid  { color:var(--accent-yellow); }
-  .brecha-value.high { color:var(--accent-red); }
+  .brecha-value.low  { color:#05e87a; }
+  .brecha-value.mid  { color:#ffaa00; text-shadow: 0 0 32px rgba(255,170,0,0.45), 0 0 8px rgba(255,170,0,0.25); }
+  .brecha-value.high { color:#ff3d5a; text-shadow: 0 0 32px rgba(255,61,90,0.45), 0 0 8px rgba(255,61,90,0.25); }
 
   .brecha-meta { flex:1; min-width:180px; }
   .brecha-sublabel {
@@ -138,21 +145,22 @@
   .gauge-fill {
     height:100%; border-radius:4px;
     transition:width 1s cubic-bezier(.4,0,.2,1);
-    background:linear-gradient(90deg,var(--accent-green),#ff7a00,var(--accent-red));
+    background:linear-gradient(90deg,var(--accent-green),var(--accent-yellow),var(--accent-red));
     width:0%;
   }
   .gauge-labels {
     display:flex; justify-content:space-between;
-    font-family:'Space Mono',monospace; font-size:0.54rem;
-    color:var(--muted); margin-top:.35rem;
+    font-family:'Space Mono',monospace; font-size:0.56rem;
+    color:var(--text2); margin-top:.35rem;
   }
 
   /* ── Cards ── */
   .cards-grid {
-    display:grid; grid-template-columns:1fr 1fr;
+    display:grid; grid-template-columns:1fr 1fr 1fr;
     gap:var(--gap); margin-bottom:var(--gap);
   }
-  @media(max-width:520px){ .cards-grid{grid-template-columns:1fr} }
+  @media(max-width:680px){ .cards-grid{grid-template-columns:1fr 1fr} }
+  @media(max-width:420px){ .cards-grid{grid-template-columns:1fr} }
 
   .card {
     background:var(--panel); border:1px solid var(--border);
@@ -163,8 +171,9 @@
     content:''; position:absolute;
     bottom:0;left:0;right:0; height:3px;
   }
-  .card.oficial::after  { background:var(--accent-blue); }
-  .card.paralelo::after { background:var(--accent-red); }
+  .card.oficial::after  { background: linear-gradient(90deg,var(--accent-green),var(--accent-cyan)); }
+  .card.paralelo::after { background: linear-gradient(90deg,var(--accent-pink),var(--accent-red)); }
+  .card.euro-card::after { background: linear-gradient(90deg,var(--accent-cyan),var(--accent-purple)); }
 
   .card-tag {
     font-family:'Space Mono',monospace;
@@ -172,8 +181,9 @@
     text-transform:uppercase; padding:.18rem .5rem;
     border-radius:3px; display:inline-block; margin-bottom:.8rem;
   }
-  .card.oficial .card-tag  { background:rgba(77,159,255,.12); color:var(--accent-blue); }
-  .card.paralelo .card-tag { background:rgba(255,64,96,.12); color:var(--accent-red); }
+  .card.oficial .card-tag   { background:rgba(5,232,122,.1);  color:var(--accent-green); }
+  .card.paralelo .card-tag  { background:rgba(255,61,90,.1);  color:var(--accent-red); }
+  .card.euro-card .card-tag { background:rgba(0,212,255,.1);  color:var(--accent-cyan); }
 
   .card-rate {
     font-size:clamp(1.5rem,3.5vw,2rem);
@@ -183,12 +193,12 @@
   .card-rate.loading { color:var(--muted); }
 
   .card-sub {
-    font-family:'Space Mono',monospace; font-size:0.61rem;
-    color:var(--muted); margin-top:.35rem;
+    font-family:'Space Mono',monospace; font-size:.63rem;
+    color:var(--text2); margin-top:.35rem;
   }
   .card-source {
-    font-family:'Space Mono',monospace; font-size:0.54rem;
-    color:var(--muted); margin-top:.8rem;
+    font-family:'Space Mono',monospace; font-size:.57rem;
+    color:var(--text2); margin-top:.8rem;
     padding-top:.6rem; border-top:1px solid var(--border);
   }
 
@@ -203,9 +213,9 @@
   @media(max-width:520px){ .diff-panel{grid-template-columns:1fr} }
 
   .diff-item .label {
-    font-family:'Space Mono',monospace; font-size:0.57rem;
+    font-family:'Space Mono',monospace; font-size:.6rem;
     text-transform:uppercase; letter-spacing:.1em;
-    color:var(--muted); margin-bottom:.3rem;
+    color:var(--text2); margin-bottom:.3rem;
   }
   .diff-item .val {
     font-size:1.25rem; font-weight:700;
@@ -219,10 +229,19 @@
     margin-bottom:var(--gap); box-shadow:var(--shadow);
     position:relative; overflow:hidden;
   }
+  .calc-section-mini-label {
+    font-family:'Space Mono',monospace; font-size:.58rem;
+    text-transform:uppercase; letter-spacing:.1em;
+    color:var(--muted); margin-bottom:.4rem;
+  }
+
+  .calc-result-box.eur-of .rlabel { color:#00cfff; }
+  .calc-result-box.eur-eq .rlabel { color:var(--accent-blue); }
+
   .euro-panel::before {
     content:''; position:absolute;
     top:0;left:0;right:0; height:3px;
-    background:linear-gradient(90deg,var(--accent-purple),#c084fc);
+    background:linear-gradient(90deg,var(--accent-cyan),var(--accent-purple));
   }
   .euro-header {
     display:flex; align-items:center;
@@ -232,7 +251,7 @@
   .euro-title { font-size:.95rem; font-weight:700; color:var(--text); }
   .euro-badge {
     font-family:'Space Mono',monospace; font-size:.57rem;
-    background:rgba(167,139,250,.12); color:var(--accent-purple);
+    background:rgba(0,212,255,.1); color:var(--accent-cyan);
     padding:.2rem .6rem; border-radius:4px;
     letter-spacing:.08em; text-transform:uppercase;
   }
@@ -245,7 +264,7 @@
     .euro-divider{transform:rotate(90deg)}
   }
   .euro-stats-grid {
-    display:grid; grid-template-columns:1fr 1fr 1fr; gap:.8rem;
+    display:grid; grid-template-columns:1fr 1fr; gap:.8rem;
   }
   @media(max-width:520px){ .euro-stats-grid{grid-template-columns:1fr} }
 
@@ -254,18 +273,18 @@
     border-radius:8px; padding:.9rem 1rem;
   }
   .euro-cell .elabel {
-    font-family:'Space Mono',monospace; font-size:.57rem;
+    font-family:'Space Mono',monospace; font-size:.62rem;
     text-transform:uppercase; letter-spacing:.08em;
-    color:var(--muted); margin-bottom:.4rem;
+    color:var(--text2); margin-bottom:.4rem;
   }
   .euro-cell .eval {
     font-size:1.15rem; font-weight:700;
     letter-spacing:-0.02em; color:var(--text); min-height:1.4em;
   }
-  .euro-cell.diff-cell .eval { color:var(--accent-purple); }
+  .euro-cell.diff-cell .eval { color:var(--accent-cyan); }
   .euro-cell .esub {
-    font-family:'Space Mono',monospace; font-size:.56rem;
-    color:var(--muted); margin-top:.2rem;
+    font-family:'Space Mono',monospace; font-size:.62rem;
+    color:var(--text2); margin-top:.25rem;
   }
   .euro-divider { text-align:center; font-size:1.1rem; color:var(--muted); font-weight:700; }
 
@@ -279,7 +298,7 @@
   .chart-panel::before {
     content:''; position:absolute;
     top:0;left:0;right:0; height:4px;
-    background:linear-gradient(90deg,var(--accent-green),var(--accent-blue));
+    background:linear-gradient(90deg,var(--accent-green),var(--accent-cyan));
   }
   .chart-header {
     display:flex; align-items:center;
@@ -304,8 +323,8 @@
     border:1px solid var(--border); background:transparent;
     color:var(--muted); cursor:pointer; transition:all .15s;
   }
-  .chart-btn:hover { border-color:var(--accent-green); color:var(--accent-green); }
-  .chart-btn.active { background:var(--accent-green); border-color:var(--accent-green); color:#0d0f18; font-weight:700; }
+  .chart-btn:hover { border-color:var(--accent-cyan); color:var(--accent-cyan); }
+  .chart-btn.active { background:var(--accent-cyan); border-color:var(--accent-cyan); color:#080b14; font-weight:700; }
 
   .chart-status {
     font-family:'Space Mono',monospace; font-size:.6rem;
@@ -317,46 +336,91 @@
   /* ── Calculator ── */
   .calc-panel {
     background:var(--panel); border:1px solid var(--border);
-    border-radius:12px; padding:1.5rem;
+    border-radius:16px; padding:1.6rem;
     margin-bottom:var(--gap); box-shadow:var(--shadow);
+    position:relative; overflow:hidden;
   }
+  .calc-panel::before {
+    content:''; position:absolute;
+    top:0;left:0;right:0; height:3px;
+    background:linear-gradient(90deg,var(--accent-purple),var(--accent-pink));
+  }
+  .calc-dir-row, .calc-tabs-row {
+    display:flex; gap:.4rem; margin-bottom:.85rem;
+  }
+  .calc-dir-btn {
+    font-family:'Outfit',sans-serif; font-size:.8rem; font-weight:600;
+    padding:.35rem 1rem; border-radius:8px;
+    border:1px solid var(--border); background:transparent;
+    color:var(--muted); cursor:pointer; transition:all .18s;
+  }
+  .calc-dir-btn:hover { border-color:var(--accent-purple); color:var(--accent-purple); }
+  .calc-dir-btn.active {
+    background:linear-gradient(135deg,var(--accent-purple),var(--accent-pink));
+    border-color:transparent; color:#fff; font-weight:700;
+    box-shadow: 0 2px 12px rgba(176,110,255,.35);
+  }
+
+  .calc-cur-btn {
+    font-family:'Outfit',sans-serif; font-size:.75rem;
+    padding:.28rem .75rem; border-radius:6px;
+    border:1px solid var(--border); background:transparent;
+    color:var(--muted); cursor:pointer; transition:all .15s;
+  }
+  .calc-cur-btn:hover { border-color:var(--accent-cyan); color:var(--accent-cyan); }
+  .calc-cur-btn.active { background:var(--accent-cyan); border-color:transparent; color:#080b14; font-weight:700; }
+
   .calc-title {
-    font-family:'Space Mono',monospace; font-size:.6rem;
-    letter-spacing:.12em; text-transform:uppercase;
+    font-family:'Outfit',sans-serif; font-size:.75rem; font-weight:600;
+    letter-spacing:.08em; text-transform:uppercase;
     color:var(--muted); margin-bottom:1rem;
   }
   .calc-field label {
-    display:block; font-family:'Space Mono',monospace;
-    font-size:.57rem; text-transform:uppercase;
-    letter-spacing:.08em; color:var(--muted); margin-bottom:.4rem;
+    display:block; font-family:'Outfit',sans-serif; font-weight:600;
+    font-size:.75rem; text-transform:uppercase;
+    letter-spacing:.06em; color:var(--text2); margin-bottom:.5rem;
   }
   .calc-field input {
     background:var(--panel2); border:1px solid var(--border);
-    border-radius:7px; padding:.65rem .9rem;
-    color:var(--text); font-family:'Space Mono',monospace;
-    font-size:1rem; font-weight:700; outline:none;
-    transition:border-color .2s; max-width:260px; width:100%;
+    border-radius:10px; padding:.7rem 1rem;
+    color:var(--text); font-family:'Outfit',sans-serif;
+    font-size:1.3rem; font-weight:700; outline:none;
+    transition:border-color .2s, box-shadow .2s;
+    max-width:280px; width:100%;
+    letter-spacing:-0.01em;
   }
-  .calc-field input:focus { border-color:var(--accent-blue); }
+  .calc-field input:focus {
+    border-color:var(--accent-purple);
+    box-shadow: 0 0 0 3px rgba(176,110,255,.15);
+  }
+  .calc-section-mini-label {
+    font-family:'Outfit',sans-serif; font-size:.78rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.08em;
+    color:var(--text2); margin-bottom:.5rem;
+  }
   .calc-result-row {
     display:grid; grid-template-columns:1fr 1fr;
-    gap:.8rem; margin-top:1rem;
+    gap:.7rem; margin-top:.6rem;
   }
   @media(max-width:520px){ .calc-result-row{grid-template-columns:1fr} }
 
   .calc-result-box {
     background:var(--panel2); border:1px solid var(--border);
-    border-radius:7px; padding:.75rem .9rem;
+    border-radius:10px; padding:.85rem 1rem;
+    transition: border-color .2s;
   }
+  .calc-result-box:hover { border-color:var(--border); }
   .calc-result-box .rlabel {
-    font-family:'Space Mono',monospace; font-size:.55rem;
-    text-transform:uppercase; letter-spacing:.08em; margin-bottom:.25rem;
+    font-family:'Outfit',sans-serif; font-size:.7rem; font-weight:600;
+    text-transform:uppercase; letter-spacing:.06em; margin-bottom:.3rem;
   }
-  .calc-result-box.usd-of .rlabel { color:var(--accent-blue); }
-  .calc-result-box.usd-p2 .rlabel { color:var(--accent-red); }
+  .calc-result-box.usd-of .rlabel { color:var(--accent-green); }
+  .calc-result-box.usd-p2 .rlabel { color:var(--accent-pink); }
+  .calc-result-box.eur-of .rlabel { color:var(--accent-cyan); }
+  .calc-result-box.eur-eq .rlabel { color:var(--accent-purple); }
   .calc-result-box .rval {
-    font-family:'Space Mono',monospace; font-size:.95rem;
-    font-weight:700; color:var(--text);
+    font-family:'Outfit',sans-serif; font-size:1.15rem;
+    font-weight:800; color:var(--text); letter-spacing:-0.02em;
   }
 
   /* ── Alert ── */
@@ -430,19 +494,66 @@
     </div>
   </div>
 
-  <!-- USD Cards -->
+  <!-- Calculator - right after brecha -->
+  <div class="section-label">Calculadora</div>
+  <div class="calc-panel">
+    <div class="calc-title">Conversor de divisas</div>
+
+    <!-- Direction toggle -->
+    <div class="calc-dir-row">
+      <button class="calc-dir-btn active" id="dirFwd" onclick="setCalcDir('fwd')">Divisa → Bs.</button>
+      <button class="calc-dir-btn" id="dirRev" onclick="setCalcDir('rev')">Bs. → Divisa</button>
+    </div>
+
+    <!-- Input -->
+    <div class="calc-field" style="margin-bottom:.8rem">
+      <label id="calcInputLabel">Monto en USD / EUR</label>
+      <input type="number" id="calcInput" value="100" min="0" step="any">
+    </div>
+
+    <!-- USD results row -->
+    <div style="margin-bottom:.5rem">
+      <div class="calc-section-mini-label">💵 USD</div>
+      <div class="calc-result-row">
+        <div class="calc-result-box usd-of">
+          <div class="rlabel" id="resLabelUsdOf">BCV Oficial USD</div>
+          <div class="rval" id="calcResUsdOf">—</div>
+        </div>
+        <div class="calc-result-box usd-p2">
+          <div class="rlabel" id="resLabelUsdP2">USDT P2P</div>
+          <div class="rval" id="calcResUsdP2">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EUR results row -->
+    <div>
+      <div class="calc-section-mini-label">💶 EUR</div>
+      <div class="calc-result-row">
+        <div class="calc-result-box eur-of">
+          <div class="rlabel" id="resLabelEurOf">BCV Oficial EUR</div>
+          <div class="rval" id="calcResEurOf">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- USD Cards (3 cards: BCV USD, USDT P2P, BCV EUR) -->
   <div class="cards-grid">
     <div class="card oficial">
       <div class="card-tag">Oficial BCV · USD</div>
       <div class="card-rate loading" id="bcvRate">—</div>
       <div class="card-sub">Bs. por USD</div>
-      <div class="card-source">ve.dolarapi.com · BCV</div>
     </div>
     <div class="card paralelo">
-      <div class="card-tag">Paralelo Binance P2P</div>
+      <div class="card-tag">USDT P2P · Binance</div>
       <div class="card-rate loading" id="p2pRate">—</div>
       <div class="card-sub">Bs. por USDT</div>
-      <div class="card-source">ve.dolarapi.com · Binance P2P</div>
+    </div>
+    <div class="card euro-card">
+      <div class="card-tag">Oficial BCV · EUR</div>
+      <div class="card-rate loading" id="bcvEurCard">—</div>
+      <div class="card-sub">Bs. por EUR</div>
     </div>
   </div>
 
@@ -453,7 +564,7 @@
       <div class="val" id="diffBs">—</div>
     </div>
     <div class="diff-item">
-      <div class="label">Ratio P2P/BCV</div>
+      <div class="label">Ratio USDT P2P/BCV</div>
       <div class="val" id="diffRatio">—</div>
     </div>
     <div class="diff-item">
@@ -489,11 +600,6 @@
         <div class="esub">EUR − USD en Bs.</div>
       </div>
       <div class="euro-cell diff-cell">
-        <div class="elabel">Tipo implícito EUR/USD</div>
-        <div class="eval" id="euroImplicit">—</div>
-        <div class="esub">Bs. EUR ÷ Bs. USD</div>
-      </div>
-      <div class="euro-cell diff-cell">
         <div class="elabel">Diferencial %</div>
         <div class="eval" id="euroDiffPct">—</div>
         <div class="esub">EUR vs USD (BCV)</div>
@@ -505,11 +611,11 @@
   <div class="section-label" style="margin-top:.4rem;">Histórico desde 01 Ene 2026</div>
   <div class="chart-panel">
     <div class="chart-header">
-      <div class="chart-title">BCV Oficial vs Paralelo Binance P2P</div>
+      <div class="chart-title">BCV Oficial vs USDT P2P Binance</div>
       <div class="chart-legend">
-        <span><span class="legend-dot" style="background:#00c875"></span>BCV Oficial</span>
-        <span><span class="legend-dot" style="background:#ff4060"></span>Paralelo P2P</span>
-        <span><span class="legend-dot" style="background:#ff7a00; border-radius:2px; height:3px; width:14px; margin-bottom:3px;"></span>Brecha %</span>
+        <span><span class="legend-dot" style="background:#05e87a"></span>BCV Oficial</span>
+        <span><span class="legend-dot" style="background:#ff3d5a"></span>USDT P2P</span>
+        <span><span class="legend-dot" style="background:#ff8c00; border-radius:2px; height:3px; width:14px; margin-bottom:3px;"></span>Brecha %</span>
       </div>
     </div>
     <div class="chart-filters">
@@ -520,26 +626,6 @@
       <canvas id="brechaChart"></canvas>
     </div>
     <div class="chart-status" id="chartStatus">Cargando histórico...</div>
-  </div>
-
-  <!-- Calculator (USD only) -->
-  <div class="section-label">Calculadora</div>
-  <div class="calc-panel">
-    <div class="calc-title">Convertir USD a Bolívares</div>
-    <div class="calc-field">
-      <label>Monto en USD</label>
-      <input type="number" id="calcInputUsd" value="100" min="0" step="any">
-    </div>
-    <div class="calc-result-row">
-      <div class="calc-result-box usd-of">
-        <div class="rlabel">BCV Oficial</div>
-        <div class="rval" id="calcOficial">—</div>
-      </div>
-      <div class="calc-result-box usd-p2">
-        <div class="rlabel">Paralelo P2P</div>
-        <div class="rval" id="calcParalelo">—</div>
-      </div>
-    </div>
   </div>
 
   <div class="actions">
@@ -641,34 +727,83 @@
     document.getElementById('gaugeFill').style.width = Math.min(brecha,100)+'%';
     document.getElementById('euroBcvUsd').textContent = fmt(bcvVal);
 
+    // EUR card
+    const eurCardEl = document.getElementById('bcvEurCard');
     if (euroVal!==null) {
+      eurCardEl.textContent = fmt(euroVal);
+      eurCardEl.classList.remove('loading');
+      popElement('bcvEurCard');
+
       const ed  = euroVal-bcvVal;
-      const er  = euroVal/bcvVal;
       const ep  = ((euroVal-bcvVal)/bcvVal)*100;
       document.getElementById('euroBcvEur').textContent  = fmt(euroVal);
       document.getElementById('euroDiffBs').textContent  = (ed>=0?'+':'')+fmt(ed);
-      document.getElementById('euroImplicit').textContent= er.toFixed(4);
       document.getElementById('euroDiffPct').textContent = (ep>=0?'+':'')+fmt(ep,1)+'%';
     } else {
-      ['euroBcvEur','euroDiffBs','euroImplicit','euroDiffPct'].forEach(id=>document.getElementById(id).textContent='N/D');
+      ['euroBcvEur','euroDiffBs','euroDiffPct'].forEach(id=>document.getElementById(id).textContent='N/D');
     }
 
     if (brecha>80)       showAlert('err',  `⚠ Brecha muy alta (${fmt(brecha,1)}%) — presión cambiaria extrema`);
     else if (brecha>40)  showAlert('warn', `Brecha moderada-alta (${fmt(brecha,1)}%) — mercado bajo tensión`);
     else                 showAlert('ok',   `Brecha contenida (${fmt(brecha,1)}%)`);
 
+    updateCalcLabels();
     updateCalc();
   }
 
-  function updateCalc() {
-    const raw = parseFloat(document.getElementById('calcInputUsd').value);
-    if (!isNaN(raw) && raw>=0) {
-      if (bcvVal!==null) document.getElementById('calcOficial').textContent  = fmt(raw*bcvVal)+' Bs.';
-      if (p2pVal!==null) document.getElementById('calcParalelo').textContent = fmt(raw*p2pVal)+' Bs.';
+  let calcDir = 'fwd';
+
+  function setCalcDir(dir) {
+    calcDir = dir;
+    document.getElementById('dirFwd').classList.toggle('active', dir==='fwd');
+    document.getElementById('dirRev').classList.toggle('active', dir==='rev');
+    updateCalcLabels();
+    updateCalc();
+  }
+
+
+  function updateCalcLabels() {
+    const lbl = document.getElementById('calcInputLabel');
+    const l1  = document.getElementById('resLabelUsdOf');
+    const l2  = document.getElementById('resLabelUsdP2');
+    const l3  = document.getElementById('resLabelEurOf');
+    const l4  = document.getElementById('resLabelEurEq');
+
+    if (calcDir === 'fwd') {
+      lbl.textContent = 'Monto en USD / EUR';
+      l1.textContent = 'BCV Oficial USD';
+      l2.textContent = 'USDT P2P';
+      l3.textContent = 'BCV Oficial EUR';
+      l4.textContent = 'Equiv. en USD';
+    } else {
+      lbl.textContent = 'Monto en Bs.';
+      l1.textContent = 'USD (BCV Oficial)';
+      l2.textContent = 'USD (USDT P2P)';
+      l3.textContent = 'EUR (BCV Oficial)';
+      l4.textContent = 'Equiv. en USD';
     }
   }
 
-  document.getElementById('calcInputUsd').addEventListener('input', updateCalc);
+  function updateCalc() {
+    const raw = parseFloat(document.getElementById('calcInput').value);
+    const r1 = document.getElementById('calcResUsdOf');
+    const r2 = document.getElementById('calcResUsdP2');
+    const r3 = document.getElementById('calcResEurOf');
+
+    if (isNaN(raw) || raw < 0) { [r1,r2,r3].forEach(r=>r.textContent='—'); return; }
+
+    if (calcDir === 'fwd') {
+      r1.textContent = bcvVal  !== null ? fmt(raw * bcvVal)  + ' Bs.' : '—';
+      r2.textContent = p2pVal  !== null ? fmt(raw * p2pVal)  + ' Bs.' : '—';
+      r3.textContent = euroVal !== null ? fmt(raw * euroVal) + ' Bs.' : 'N/D';
+    } else {
+      r1.textContent = bcvVal  !== null ? fmt(raw / bcvVal)  + ' USD' : '—';
+      r2.textContent = p2pVal  !== null ? fmt(raw / p2pVal)  + ' USD' : '—';
+      r3.textContent = euroVal !== null ? fmt(raw / euroVal) + ' EUR' : 'N/D';
+    }
+  }
+
+  document.getElementById('calcInput').addEventListener('input', updateCalc);
 
   /* ─────────────────────────────────────────
      HISTÓRICO: fetch desde dolarapi histórico
@@ -757,8 +892,8 @@
             type: 'line',
             label: 'BCV Oficial (Bs.)',
             data: serieO,
-            borderColor: '#00c875',
-            backgroundColor: 'rgba(0,200,117,0.08)',
+            borderColor: '#05e87a',
+            backgroundColor: 'rgba(5,232,122,0.07)',
             borderWidth: 2,
             pointRadius: 0,
             pointHoverRadius: 4,
@@ -769,7 +904,7 @@
           },
           {
             type: 'line',
-            label: 'Paralelo P2P (Bs.)',
+            label: 'USDT P2P (Bs.)',
             data: serieP,
             borderColor: '#ff4060',
             backgroundColor: 'rgba(255,64,96,0.08)',
@@ -836,37 +971,26 @@
               maxRotation: 45,
               maxTicksLimit: 12,
             },
-            grid: { color: 'rgba(37,40,64,0.8)' },
+            grid: { color: 'rgba(31,36,56,0.8)' },
           },
           yRate: {
             type: 'linear',
-            position: 'left',
-            ticks: {
-              color: '#9aa3c2',
-              font: { family: 'Space Mono', size: 9 },
-              callback: v => v.toLocaleString('es-VE', {maximumFractionDigits:0})
-            },
-            grid: { color: 'rgba(37,40,64,0.8)' },
-            title: {
-              display: true,
-              text: 'Bs. / USD',
-              color: '#555e80',
-              font: { family: 'Space Mono', size: 9 }
-            }
+            position: 'right',
+            display: false,
           },
           yBrecha: {
             type: 'linear',
-            position: 'right',
+            position: 'left',
             ticks: {
-              color: '#ff7a00',
+              color: '#ff8c00',
               font: { family: 'Space Mono', size: 9 },
               callback: v => v.toFixed(0)+'%'
             },
-            grid: { drawOnChartArea: false },
+            grid: { color: 'rgba(31,36,56,0.8)' },
             title: {
               display: true,
               text: 'Brecha %',
-              color: '#ff7a00',
+              color: '#ff8c00',
               font: { family: 'Space Mono', size: 9 }
             }
           }
