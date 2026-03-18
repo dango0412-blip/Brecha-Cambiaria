@@ -415,6 +415,32 @@
     font-family:'Outfit',sans-serif; font-size:.7rem; font-weight:600;
     text-transform:uppercase; letter-spacing:.06em; margin-bottom:.3rem;
   }
+  .calc-box-header {
+    display:flex; align-items:center;
+    justify-content:space-between; margin-bottom:.3rem;
+  }
+  .calc-box-header .rlabel { margin-bottom:0; }
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--text2);
+    border-radius: 4px;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: .8rem;
+    line-height: 1;
+    padding: .15rem .4rem;
+    transition: all .18s;
+    flex-shrink: 0;
+  }
+  .copy-btn:hover { border-color:var(--accent-cyan); color:var(--accent-cyan); }
+  .copy-btn.copied {
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+    font-size: .55rem;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: .04em;
+    padding: .18rem .4rem;
+  }
   .calc-result-box.usd-of .rlabel { color:var(--accent-green); }
   .calc-result-box.usd-p2 .rlabel { color:var(--accent-pink); }
   .calc-result-box.eur-of .rlabel { color:var(--accent-cyan); }
@@ -517,11 +543,17 @@
       <div class="calc-section-mini-label">💵 USD</div>
       <div class="calc-result-row">
         <div class="calc-result-box usd-of">
-          <div class="rlabel" id="resLabelUsdOf">BCV Oficial USD</div>
+          <div class="calc-box-header">
+            <div class="rlabel" id="resLabelUsdOf">BCV Oficial USD</div>
+            <button class="copy-btn" onclick="copyCalc('calcResUsdOf', this)" title="Copiar">⎘</button>
+          </div>
           <div class="rval" id="calcResUsdOf">—</div>
         </div>
         <div class="calc-result-box usd-p2">
-          <div class="rlabel" id="resLabelUsdP2">USDT P2P</div>
+          <div class="calc-box-header">
+            <div class="rlabel" id="resLabelUsdP2">USDT P2P</div>
+            <button class="copy-btn" onclick="copyCalc('calcResUsdP2', this)" title="Copiar">⎘</button>
+          </div>
           <div class="rval" id="calcResUsdP2">—</div>
         </div>
       </div>
@@ -532,7 +564,10 @@
       <div class="calc-section-mini-label">💶 EUR</div>
       <div class="calc-result-row">
         <div class="calc-result-box eur-of">
-          <div class="rlabel" id="resLabelEurOf">BCV Oficial EUR</div>
+          <div class="calc-box-header">
+            <div class="rlabel" id="resLabelEurOf">BCV Oficial EUR</div>
+            <button class="copy-btn" onclick="copyCalc('calcResEurOf', this)" title="Copiar">⎘</button>
+          </div>
           <div class="rval" id="calcResEurOf">—</div>
         </div>
       </div>
@@ -1117,6 +1152,30 @@
   function startAutoRefresh() {
     if (autoRefreshTimer) clearInterval(autoRefreshTimer);
     autoRefreshTimer = setInterval(fetchRates, 5*60*1000);
+  }
+
+  function copyCalc(id, btn) {
+    const el = document.getElementById(id);
+    const raw = el?.textContent?.trim();
+    if (!raw || raw === '—') return;
+    // Venezuelan format: 6.651,60 Bs.  → remove thousands dots, keep comma as decimal
+    // Strip any non-numeric suffix (Bs., USD, EUR, etc.)
+    const clean = raw
+      .replace(/\s*(Bs\.|USD|EUR|eq\.).*$/i, '') // remove unit suffix
+      .trim()
+      .replace(/\./g, '')   // remove thousands separators (dots)
+      .replace(',', '.');   // convert decimal comma to dot → 6651.60
+    const doClipboard = () => {
+      btn.textContent = '✓';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '⎘'; btn.classList.remove('copied'); }, 1800);
+    };
+    navigator.clipboard?.writeText(clean).then(doClipboard).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = clean; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta); doClipboard();
+    });
   }
 
   fetchRates();
