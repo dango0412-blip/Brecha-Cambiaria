@@ -512,7 +512,7 @@
   <header>
     <div class="logo-area">
       <h1>BRECHA <span>CAMBIARIA</span></h1>
-      <p>Monitor · Venezuela · BCV vs Binance P2P</p>
+      <p>Monitor · Venezuela</p>
     </div>
     <div class="status-bar">
       <div class="dot" id="statusDot"></div>
@@ -683,7 +683,9 @@
       </div>
     </div>
     <div class="chart-filters">
+      <button class="chart-btn" id="btn1w" onclick="setChartRange('1w')">1S</button>
       <button class="chart-btn" id="btn1m" onclick="setChartRange('1m')">1M</button>
+      <button class="chart-btn" id="btn6m" onclick="setChartRange('6m')">6M</button>
       <button class="chart-btn active" id="btnAll" onclick="setChartRange('all')">Histórico 2026</button>
     </div>
     <div class="chart-wrap">
@@ -714,32 +716,36 @@
 
   function setChartRange(range) {
     currentRange = range;
-    document.getElementById('btn1m')?.classList.remove('active');
-    document.getElementById('btnAll')?.classList.remove('active');
-    document.getElementById('btn'+(range==='1m'?'1m':'All'))?.classList.add('active');
+    ['btn1w','btn1m','btn6m','btnAll'].forEach(id =>
+      document.getElementById(id)?.classList.remove('active')
+    );
+    const btnMap = { '1w':'btn1w', '1m':'btn1m', '6m':'btn6m', 'all':'btnAll' };
+    document.getElementById(btnMap[range])?.classList.add('active');
 
     if (chartAllLabels.length === 0) return;
 
-    let labels, serieO, serieP, serieBrecha;
     const total = chartAllLabels.length;
+    const sliceMap = { '1d': 1, '1w': 7, '1m': 30, '6m': 183 };
+    const days = sliceMap[range];
 
-    if (range === '1m') {
-      const slice = Math.max(0, total-30);
-      labels = chartAllLabels.slice(slice);
-      serieO = chartAllO.slice(slice);
-      serieP = chartAllP.slice(slice);
+    let labels, serieO, serieP, serieBrecha;
+    if (days !== undefined) {
+      const slice = Math.max(0, total - days);
+      labels      = chartAllLabels.slice(slice);
+      serieO      = chartAllO.slice(slice);
+      serieP      = chartAllP.slice(slice);
       serieBrecha = chartAllBrecha.slice(slice);
     } else {
-      labels = chartAllLabels;
-      serieO = chartAllO;
-      serieP = chartAllP;
+      labels      = chartAllLabels;
+      serieO      = chartAllO;
+      serieP      = chartAllP;
       serieBrecha = chartAllBrecha;
     }
 
     renderChart(labels, serieO, serieP, serieBrecha);
     document.getElementById('chartStatus').textContent =
       labels.length > 1
-        ? `${labels.length} días · ${chartAllLabels[chartAllLabels.length-labels.length]} → ${chartAllLabels[chartAllLabels.length-1]}`
+        ? `${labels.length} días · ${labels[0]} → ${labels[labels.length-1]}`
         : labels.length === 1 ? `Último día disponible: ${labels[0]}` : 'Sin datos';
   }
 
