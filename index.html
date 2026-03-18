@@ -535,7 +535,7 @@
     <!-- Input -->
     <div class="calc-field" style="margin-bottom:.8rem">
       <label id="calcInputLabel">Monto en USD / EUR</label>
-      <input type="number" id="calcInput" value="100" min="0" step="any">
+      <input type="text" id="calcInput" value="100" inputmode="decimal" autocomplete="off" placeholder="0">
     </div>
 
     <!-- USD results row -->
@@ -647,7 +647,7 @@
   </div>
 
   <!-- Historical Chart -->
-  <div class="section-label" style="margin-top:.4rem;">Histórico desde 01 Ene 2026</div>
+  <div class="section-label" style="margin-top:.4rem;">Histórico 2026</div>
   <div class="chart-panel">
     <div class="chart-header">
       <div class="chart-title">BCV Oficial vs USDT P2P Binance</div>
@@ -824,7 +824,7 @@
   }
 
   function updateCalc() {
-    const raw = parseFloat(document.getElementById('calcInput').value);
+    const raw = parseCalcInput();
     const r1 = document.getElementById('calcResUsdOf');
     const r2 = document.getElementById('calcResUsdP2');
     const r3 = document.getElementById('calcResEurOf');
@@ -842,7 +842,51 @@
     }
   }
 
-  document.getElementById('calcInput').addEventListener('input', updateCalc);
+  // Format calc input as Venezuelan locale (. thousands, , decimal)
+  function parseCalcInput() {
+    const raw = document.getElementById('calcInput').value;
+    // Remove all dots (thousands sep), replace comma with dot for parseFloat
+    return parseFloat(raw.replace(/\./g, '').replace(',', '.'));
+  }
+
+  function formatCalcInput(val) {
+    if (isNaN(val)) return '';
+    // Split integer and decimal parts
+    const parts = val.toString().split('.');
+    const intPart = parseInt(parts[0]).toLocaleString('es-VE');
+    return parts.length > 1 ? intPart + ',' + parts[1] : intPart;
+  }
+
+  document.getElementById('calcInput').addEventListener('input', function(e) {
+    const el = e.target;
+    const cursorPos = el.selectionStart;
+    const prevLen = el.value.length;
+
+    // Allow only digits, dots, and one comma
+    let raw = el.value.replace(/[^0-9.,]/g, '');
+
+    // Only one comma allowed
+    const commaIdx = raw.indexOf(',');
+    if (commaIdx !== -1) {
+      raw = raw.substring(0, commaIdx + 1) + raw.substring(commaIdx + 1).replace(/[,]/g, '');
+    }
+
+    // Split on comma to preserve decimals
+    const parts = raw.split(',');
+    // Format integer part with dots as thousand separators
+    const intRaw = parts[0].replace(/\./g, ''); // remove existing dots
+    const intFormatted = intRaw === '' ? '' : parseInt(intRaw || '0').toLocaleString('es-VE');
+    const formatted = parts.length > 1 ? intFormatted + ',' + parts[1] : intFormatted;
+
+    el.value = formatted;
+
+    // Restore cursor position accounting for added separators
+    const newLen = formatted.length;
+    const diff = newLen - prevLen;
+    el.setSelectionRange(cursorPos + diff, cursorPos + diff);
+
+    updateCalc();
+  });
 
   /* ─────────────────────────────────────────
      HISTÓRICO: fetch desde dolarapi histórico
