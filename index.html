@@ -391,18 +391,27 @@
     font-size:.75rem; text-transform:uppercase;
     letter-spacing:.06em; color:var(--text2); margin-bottom:.5rem;
   }
-  .calc-field input {
-    background:var(--panel2); border:1px solid var(--border);
-    border-radius:10px; padding:.7rem 1rem;
-    color:var(--text); font-family:'Outfit',sans-serif;
-    font-size:1.3rem; font-weight:700; outline:none;
-    transition:border-color .2s, box-shadow .2s;
-    max-width:280px; width:100%;
-    letter-spacing:-0.01em;
+  .calc-display-wrap {
+    display:flex; align-items:center; gap:.75rem;
+    background:var(--panel2); border:1.5px solid var(--border);
+    border-radius:10px; padding:.65rem 1rem;
+    cursor:text; transition:border-color .2s;
+    max-width:340px;
   }
-  .calc-field input:focus {
+  .calc-display-wrap:focus-within {
     border-color:var(--accent-purple);
     box-shadow: 0 0 0 3px rgba(124,92,252,.15);
+  }
+  .calc-currency-symbol {
+    font-family:'Outfit',sans-serif; font-size:1.2rem;
+    font-weight:600; color:var(--muted); flex-shrink:0;
+    user-select:none;
+  }
+  .calc-display {
+    flex:1; text-align:right;
+    font-family:'Outfit',sans-serif; font-size:1.35rem;
+    font-weight:700; color:var(--text); letter-spacing:-.01em;
+    user-select:none; min-width:0;
   }
   .calc-section-mini-label {
     font-family:'Outfit',sans-serif; font-size:.78rem; font-weight:700;
@@ -545,8 +554,13 @@
     <!-- Input -->
     <div class="calc-field" style="margin-bottom:.8rem">
       <label id="calcInputLabel">Monto en USD / EUR</label>
-      <input type="text" id="calcInput" value="100" inputmode="text" autocomplete="off" placeholder="0">
-      <div class="calc-decimal-hint">Usa <kbd>,</kbd> para decimales · ej: <span>1.500,50</span></div>
+      <div class="calc-display-wrap">
+        <span class="calc-currency-symbol" id="calcSymbol">$</span>
+        <div class="calc-display" id="calcDisplay" onclick="focusCalcInput()">
+          <span id="calcDisplayVal">1,00</span>
+        </div>
+        <input type="tel" id="calcInput" autocomplete="off" style="position:absolute;opacity:0;width:1px;height:1px;pointer-events:none;">
+      </div>
     </div>
 
     <!-- USD results row -->
@@ -814,23 +828,23 @@
 
   function updateCalcLabels() {
     const lbl = document.getElementById('calcInputLabel');
+    const sym = document.getElementById('calcSymbol');
     const l1  = document.getElementById('resLabelUsdOf');
     const l2  = document.getElementById('resLabelUsdP2');
     const l3  = document.getElementById('resLabelEurOf');
-    const l4  = document.getElementById('resLabelEurEq');
 
     if (calcDir === 'fwd') {
       lbl.textContent = 'Monto en USD / EUR';
+      if (sym) sym.textContent = '$';
       l1.textContent = 'BCV Oficial USD';
       l2.textContent = 'USDT P2P';
       l3.textContent = 'BCV Oficial EUR';
-      l4.textContent = 'Equiv. en USD';
     } else {
       lbl.textContent = 'Monto en Bs.';
+      if (sym) sym.textContent = 'Bs.';
       l1.textContent = 'USD (BCV Oficial)';
       l2.textContent = 'USD (USDT P2P)';
       l3.textContent = 'EUR (BCV Oficial)';
-      l4.textContent = 'Equiv. en USD';
     }
   }
 
@@ -853,49 +867,67 @@
     }
   }
 
-  // Format calc input as Venezuelan locale (. thousands, , decimal)
+  // ── Right-to-left calculator input ──
+  let calcRawCents = 100; // stored as integer cents (×100), default 1.00
+
+  function calcCentsToDisplay(cents) {
+    const negative = cents < 0;
+    const abs = Math.abs(cents);
+    const intPart = Math.floor(abs / 100);
+    const decPart = String(abs % 100).padStart(2, '0');
+    const intFormatted = intPart.toLocaleString('es-VE');
+    return (negative ? '-' : '') + intFormatted + ',' + decPart;
+  }
+
+  function updateCalcDisplay() {
+    document.getElementById('calcDisplayVal').textContent = calcCentsToDisplay(calcRawCents);
+  }
+
+  function focusCalcInput() {
+    document.getElementById('calcInput').focus();
+  }
+
   function parseCalcInput() {
-    const raw = document.getElementById('calcInput').value;
-    // Remove all dots (thousands sep), replace comma with dot for parseFloat
-    return parseFloat(raw.replace(/\./g, '').replace(',', '.'));
+    return calcRawCents / 100;
   }
 
-  function formatCalcInput(val) {
-    if (isNaN(val)) return '';
-    // Split integer and decimal parts
-    const parts = val.toString().split('.');
-    const intPart = parseInt(parts[0]).toLocaleString('es-VE');
-    return parts.length > 1 ? intPart + ',' + parts[1] : intPart;
-  }
-
-  document.getElementById('calcInput').addEventListener('input', function(e) {
-    const el = e.target;
-    const cursorPos = el.selectionStart;
-    const prevLen = el.value.length;
-
-    // Allow only digits, dots, and one comma
-    let raw = el.value.replace(/[^0-9.,]/g, '');
-
-    // Only one comma allowed
-    const commaIdx = raw.indexOf(',');
-    if (commaIdx !== -1) {
-      raw = raw.substring(0, commaIdx + 1) + raw.substring(commaIdx + 1).replace(/[,]/g, '');
+  document.getElementById('calcInput').addEventListener('keydown', function(e) {
+    if (e.key >= '0' && e.key <= '9') {
+      e.preventDefault();
+      const digit = parseInt(e.key);
+      // Shift digits left and add new digit at the right of cents
+      const newCents = (calcRawCents * 10 + (calcRawCents >= 0 ? digit : -digit));
+      if (newCents < 100000000000) { // max 999.999.999,99
+        calcRawCents = newCents;
+      }
+      updateCalcDisplay();
+      updateCalc();
+    } else if (e.key === 'Backspace') {
+      e.preventDefault();
+      calcRawCents = Math.trunc(calcRawCents / 10);
+      updateCalcDisplay();
+      updateCalc();
+    } else if (e.key === 'Escape' || e.key === 'Delete') {
+      e.preventDefault();
+      calcRawCents = 0;
+      updateCalcDisplay();
+      updateCalc();
     }
+  });
 
-    // Split on comma to preserve decimals
-    const parts = raw.split(',');
-    // Format integer part with dots as thousand separators
-    const intRaw = parts[0].replace(/\./g, ''); // remove existing dots
-    const intFormatted = intRaw === '' ? '' : parseInt(intRaw || '0').toLocaleString('es-VE');
-    const formatted = parts.length > 1 ? intFormatted + ',' + parts[1] : intFormatted;
-
-    el.value = formatted;
-
-    // Restore cursor position accounting for added separators
-    const newLen = formatted.length;
-    const diff = newLen - prevLen;
-    el.setSelectionRange(cursorPos + diff, cursorPos + diff);
-
+  // Also handle mobile numeric keyboard input events
+  document.getElementById('calcInput').addEventListener('input', function(e) {
+    const val = e.data;
+    if (val && val >= '0' && val <= '9') {
+      const digit = parseInt(val);
+      const newCents = calcRawCents * 10 + digit;
+      if (newCents < 100000000000) calcRawCents = newCents;
+    } else if (!val) {
+      // backspace on mobile
+      calcRawCents = Math.trunc(calcRawCents / 10);
+    }
+    this.value = ''; // keep hidden input empty
+    updateCalcDisplay();
     updateCalc();
   });
 
@@ -1235,6 +1267,7 @@
 
   fetchRates();
   fetchHistorico();
+  updateCalcDisplay();
   startAutoRefresh();
 </script>
 </body>
